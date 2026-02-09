@@ -1,6 +1,10 @@
-# 🏛️ Tribe Protocol
+<p align="center">
+  <img src="assets/logo.png" alt="Tribe Protocol" width="200">
+</p>
 
-**Trust lookup system for OpenClaw bots.**
+<h1 align="center">Tribe Protocol</h1>
+
+<p align="center"><strong>Trust lookup system for OpenClaw bots.</strong></p>
 
 A SQLite-backed identity and trust database that bots query before responding to any non-owner message. Enforces trust tiers, channel access rules, and data boundaries.
 

@@ -45,9 +45,9 @@ check_db() {
     fi
 }
 
-# Sanitize string for SQL (escape single quotes)
+# Sanitize string for SQL (escape single quotes → double single quotes)
 sql_escape() {
-    echo "${1//\'/\'\'}"
+    echo "$1" | sed "s/'/''/g"
 }
 
 # Validate discord ID is numeric
