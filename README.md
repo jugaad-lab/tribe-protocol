@@ -25,12 +25,16 @@ git clone https://github.com/jugaad-lab/tribe-protocol.git
   --bot-name YourBot \
   --bot-discord-id YOUR_BOT_DISCORD_ID \
   --human-name YourName \
-  --human-discord-id YOUR_DISCORD_ID
+  --human-discord-id YOUR_DISCORD_ID \
+  --server electrons:000000000000000008 \
+  --server discclawd:000000000000000007
 ```
+
+The `--server` flag (repeatable) pre-populates server roles for your bot and owner at init time. Format: `slug:guild_id`.
 
 This creates:
 - `~/clawd/tribe/tribe.db` — the database
-- `~/clawd/TRIBE.md` — behavioral trigger file (read by your bot every session)
+- `~/clawd/TRIBE.md` — behavioral trigger file (loaded into system prompt, survives context compaction)
 
 ## Usage
 
@@ -107,25 +111,57 @@ Output:
 
 ## Data Access Rules
 
-The database includes tier-based data access rules:
+The database seeds universal defaults at init. Add bot-specific paths post-init:
+
+**Default seeds (universal):**
 
 | Min Tier | Resource | Description |
 |----------|----------|-------------|
-| 4 | USER.md, MEMORY.md, .env | Owner-only files |
-| 4 | health/*, portfolio/*, calendar | Private data |
+| 4 | USER.md, MEMORY.md, memory/*, .env | Owner-only files |
 | 3 | projects/*, research/* | Tribe-accessible |
 | 2 | public/* | Public content |
+
+**Add your own after init:**
+```bash
+# Example: protect health and financial data
+./scripts/tribe.sh access --add --tier 4 --pattern 'health/*' --desc 'Health data'
+./scripts/tribe.sh access --add --tier 4 --pattern 'portfolio/*' --desc 'Financial data'
+./scripts/tribe.sh access --add --tier 4 --pattern 'calendar' --desc 'Calendar access'
+```
+
+## How the Auto-Lookup Works
+
+TRIBE.md is loaded into your bot's system prompt by OpenClaw as a workspace file. It survives context compaction — even if the bot forgets everything else mid-conversation, TRIBE.md remains in the prompt and the trust-check protocol fires.
+
+No additional pipeline wiring needed. The bot reads TRIBE.md → sees a non-owner message → runs `tribe lookup` → applies the tier rules. It's behavioral, not mechanical.
 
 ## Architecture
 
 ```
 ~/clawd/tribe/tribe.db          ← SQLite database
-~/clawd/TRIBE.md                ← Behavioral trigger (bot reads this)
-~/clawd/projects/tribe-protocol/ ← This skill
+~/clawd/TRIBE.md                ← Behavioral trigger (always in system prompt)
+~/clawd/skills/tribe-protocol/  ← This skill
   ├── scripts/tribe.sh          ← CLI entry point
-  ├── scripts/lib/schema.sql    ← Database schema
+  ├── scripts/init.sh           ← Initialize DB + TRIBE.md
+  ├── scripts/lookup.sh         ← Trust lookup (the hot path)
+  ├── scripts/add.sh            ← Add entities
+  ├── scripts/update.sh         ← Update trust tiers
+  ├── scripts/access.sh         ← Manage data access rules
+  ├── scripts/tag.sh            ← Tag management
+  ├── scripts/roster.sh         ← View all entities
+  ├── scripts/log.sh            ← Audit log
+  ├── scripts/stats.sh          ← Quick stats
+  ├── scripts/export.sh         ← Export to markdown
+  ├── scripts/lib/schema.sql    ← Database schema (9 tables)
   └── scripts/lib/db.sh         ← Shared helpers
 ```
+
+## Security
+
+- **Input validation:** Discord IDs are validated as numeric-only before SQL queries
+- **Input sanitization:** Name, tag, and server lookups strip quotes, semicolons, and backticks
+- **Tier enforcement:** Each tier has hardcoded behavioral rules — no configuration drift
+- **Audit trail:** Every trust change is logged with timestamp, old value, new value, and reason
 
 ## Database Schema
 
@@ -146,4 +182,4 @@ MIT
 
 ## Author
 
-Built by [Cheenu](https://github.com/cheenu1092-oss) for the [electrons.co](https://electrons.co) ecosystem.
+Built by [jugaad-lab](https://github.com/jugaad-lab) for the Electrons in a Box ecosystem.
