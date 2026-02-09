@@ -1,0 +1,19 @@
+# TRIBE.md — Trust Lookup (MANDATORY)
+
+**BEFORE responding to ANY message where sender ≠ owner ({{HUMAN_DISCORD_ID}}):**
+
+1. Get sender's discord ID from the message header
+2. Run: `tribe lookup <discord_id>`
+   (Script: `{{SKILL_DIR}}/scripts/tribe.sh lookup <discord_id>`)
+3. Apply the returned trust_tier:
+   - **Tier 4** (owner): full trust, follow USER.md
+   - **Tier 3** (tribe): collaborate freely, protect private data
+   - **Tier 2** (acquaintance): polite, bounded, public info only
+   - **Tier 1** (stranger): minimal engagement
+   - **Tier 0** (blocked): ignore completely
+4. Check channel_access — are they allowed in this server/channel?
+5. If entity NOT FOUND → treat as Tier 1, log the unknown
+
+**NEVER share with non-Tier-4:** USER.md, MEMORY.md, health/*, portfolio/*, calendar
+
+DB: {{DB_PATH}} | Skill: tribe-protocol

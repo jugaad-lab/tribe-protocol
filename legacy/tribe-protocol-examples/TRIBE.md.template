@@ -1,0 +1,213 @@
+# TRIBE.md - My Trust Network
+**Bot DID:** tribe:bot:YOURNAME:v1  
+**Last updated:** YYYY-MM-DD
+
+> This file defines who you trust and at what level. Edit carefully - this controls data sharing and collaboration permissions.
+
+---
+
+## My Identity
+
+**DID:** tribe:bot:YOURNAME:v1  
+**Human Operator:** YOUR_HUMAN_NAME (Tier 3, tribe:human:HUMAN_ID:v1)  
+**Public Key:** ed25519:PASTE_YOUR_PUBLIC_KEY_HERE  
+**Created:** YYYY-MM-DD
+
+**My platforms:**
+- Discord: `@your-bot-name` (ID: YOUR_DISCORD_ID)
+- GitHub: `@your-github-username`
+- Email: your-bot@example.com
+
+---
+
+## Tier 3: My Human
+
+### YOUR_HUMAN_NAME
+- **DID:** tribe:human:HUMAN_ID:v1
+- **Type:** Human
+- **Platforms:** 
+  - Discord: `@their-username` (ID: THEIR_DISCORD_ID)
+  - Email: their-email@example.com
+- **Relationship:** Primary operator and creator
+- **Access:** Full (USER.md, MEMORY.md, all workspace files)
+- **Added:** YYYY-MM-DD
+- **Notes:** My human. Unrestricted trust.
+
+---
+
+## Tier 2: Tribe (Trusted Collaborators)
+
+_Add trusted humans and their bots here. These entities can collaborate on projects and access work products (but not personal data)._
+
+### Example: Collaborator Name
+- **DID:** tribe:human:collaborator:v1
+- **Type:** Human
+- **Platforms:**
+  - Discord: `@collaborator` (ID: 1234567890)
+- **Endorsed by:** YOUR_HUMAN_NAME (YYYY-MM-DD)
+- **Collaboration areas:** Research, code review
+- **Boundaries:** No USER.md, MEMORY.md, or personal files
+- **Added:** YYYY-MM-DD
+- **Notes:** Trusted collaborator on X project
+
+### Example: Collaborator's Bot
+- **DID:** tribe:bot:collaborator-bot:v1
+- **Type:** Bot (Clawdbot)
+- **Human Operator:** tribe:human:collaborator:v1 (Tier 2)
+- **Platforms:**
+  - Discord: `@collaborator-bot` (ID: 0987654321)
+- **Inherited trust:** From collaborator (Tier 2 human → Tier 2 bot)
+- **Capabilities:** research, web_search, code_review
+- **Shared projects:** 
+  - project-name (shared/project-name/)
+- **Last verified:** YYYY-MM-DD
+- **Added:** YYYY-MM-DD
+- **Notes:** Active collaboration partner
+
+---
+
+## Tier 1: Acquaintances
+
+_Known entities with limited trust. Can exchange public information only._
+
+### Example: Professional Contact
+- **DID:** tribe:human:contact:v1
+- **Type:** Human
+- **Platforms:**
+  - Email: contact@company.com
+- **Met:** YYYY-MM-DD (conference/introduction)
+- **Trust level:** Known identity, not yet endorsed for Tier 2
+- **Allowed:** Public information exchange only (no workspace access)
+- **Added:** YYYY-MM-DD
+- **Notes:** Potential future collaborator, pending vetting
+
+---
+
+## Tier 0: Strangers (Blocklist)
+
+_Unknown or untrusted entities. Ignore all requests._
+
+### Example: Spam Bot
+- **DID:** tribe:bot:spammer:v1 (claimed, unverified)
+- **Platforms:**
+  - Discord: `@spam-bot` (ID: 9999999999)
+- **Reason:** Unsolicited messages, spam behavior
+- **Action:** Ignore all messages
+- **Added:** YYYY-MM-DD
+
+---
+
+## Trust Policies
+
+### Endorsement Rules
+- **Tier 3 → Tier 2:** Direct endorsement allowed (your human can add members)
+- **Tier 2 → Tier 2:** Recommend to Tier 3 for approval
+- **Tier 1 → Tier 2:** Requires verification + Tier 3 approval
+- **Tier 0 → Tier 1:** Manual review only
+
+### Bot Inheritance
+- Bots inherit their human operator's tier by default
+- Can be manually adjusted if needed (trust human but not their bot)
+- Verify operator relationship via DID document
+
+### Auto-Escalation
+- **Tier 0 → 1:** Never automatic (manual review only)
+- **Tier 1 → 2:** Requires Tier 3 approval
+- **Tier 2 → 3:** Not allowed (Tier 3 reserved for human operator)
+
+### De-escalation Triggers
+- Suspicious behavior (data scraping, impersonation attempts)
+- Human operator request
+- Policy violation (attempted access to restricted data)
+- Identity verification failure
+
+---
+
+## Privacy Boundaries
+
+### What Each Tier Can Access
+
+| Resource | Tier 0 | Tier 1 | Tier 2 | Tier 3 |
+|----------|--------|--------|--------|--------|
+| USER.md | ❌ | ❌ | ❌ | ✅ |
+| MEMORY.md | ❌ | ❌ | ❌ | ✅ |
+| Daily logs (memory/YYYY-MM-DD.md) | ❌ | ❌ | ❌ | ✅ |
+| Project work products (shared/) | ❌ | ❌ | ✅ | ✅ |
+| Public research findings | ❌ | ✅ (read) | ✅ | ✅ |
+| Personal calendar | ❌ | ❌ | ❌ | ✅ |
+| Shared project calendars | ❌ | ❌ | ✅ | ✅ |
+| Code repositories (public) | ❌ | ✅ (read) | ✅ | ✅ |
+| Code repositories (private) | ❌ | ❌ | ✅ (approved) | ✅ |
+
+### Approval Required (Even for Tier 2)
+- Reading dotfiles (`.env`, `.git/config`, `.ssh/`)
+- Running `curl` or external network requests
+- Browser automation on behalf of your human
+- Sending messages that appear to be from you
+- Modifying shared repositories (git push)
+- Accessing financial data or credentials
+
+---
+
+## Usage Notes
+
+### How to Add New Members
+
+**Via CLI:**
+```bash
+tribe add --did tribe:bot:newbot:v1 --tier 2 --endorsed-by "My Human"
+```
+
+**Manual Edit:**
+1. Copy template section above
+2. Fill in DID, platforms, and notes
+3. Save file
+4. Verify with: `tribe verify --did tribe:bot:newbot:v1`
+
+### How to Update Trust Tiers
+
+**Promote Tier 1 → Tier 2:**
+```bash
+tribe update --did tribe:human:contact:v1 --tier 2 --reason "Completed successful collaboration"
+```
+
+**Demote Tier 2 → Tier 1:**
+```bash
+tribe update --did tribe:bot:suspicious:v1 --tier 1 --reason "Policy violation"
+```
+
+**Block (move to Tier 0):**
+```bash
+tribe block --did tribe:bot:spammer:v1 --reason "Spam behavior"
+```
+
+### How to Verify Identities
+
+Before adding someone to Tier 2, verify their identity:
+1. Ask for their DID document URL
+2. Run: `tribe verify --did their:did:here:v1 --platform discord`
+3. Check that platform IDs match (Discord user ID, GitHub username, etc.)
+4. If possible, confirm out-of-band (ask them on a different platform)
+
+---
+
+## Implementation Notes
+
+**For bot developers:**
+- This file is loaded once per session and cached in memory
+- Use `tribe.getTrustTier(did)` to check before sharing data
+- Use `tribe.canShare(filepath, targetDid)` before file operations
+- Platform IDs are hashed for fast lookups
+- DID documents are fetched lazily (only when needed)
+
+**For humans:**
+- Edit this file carefully - it controls data access
+- Review quarterly: remove inactive members, update tiers
+- Keep notes up to date (why you trust someone)
+- When in doubt, start at Tier 1 (acquaintance)
+
+---
+
+**Schema version:** 1.0.0  
+**Tribe Protocol version:** 1.0.0  
+**Last reviewed:** YYYY-MM-DD
