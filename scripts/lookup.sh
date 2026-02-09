@@ -59,9 +59,13 @@ if [ -n "$DISCORD_ID" ]; then
 
     # Format output
     echo "🔍 $NAME_V | $TYPE_V | Tier $TIER_V ($(tier_label "$TIER_V")) | Status: $STATUS_V"
-    [ -n "$OWNER_V" ] && printf "   Owner: %s" "$OWNER_V"
-    [ -n "$REL_V" ] && printf " | Relationship: %s" "$REL_V"
-    ([ -n "$OWNER_V" ] || [ -n "$REL_V" ]) && echo ""
+    if [ -n "$OWNER_V" ] && [ -n "$REL_V" ]; then
+        echo "   Owner: $OWNER_V | Relationship: $REL_V"
+    elif [ -n "$OWNER_V" ]; then
+        echo "   Owner: $OWNER_V"
+    elif [ -n "$REL_V" ]; then
+        echo "   Relationship: $REL_V"
+    fi
     [ -n "$BIO_V" ] && echo "   Bio: $BIO_V"
     [ -n "$PLATFORMS" ] && echo "   Platforms: $PLATFORMS"
     [ -n "$SERVERS" ] && echo "   Servers: $SERVERS"
