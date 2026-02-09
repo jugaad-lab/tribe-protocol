@@ -4,6 +4,9 @@
 
 <h1 align="center">Tribe Protocol</h1>
 
+<p align="center">[![ClawHub](https://img.shields.io/badge/ClawHub-tribe--protocol-teal)](https://clawhub.ai/skills/tribe-protocol)</p>
+<p align="center">**Install via ClawHub:** `clawhub install tribe-protocol`</p>
+
 <p align="center"><strong>Trust lookup system for OpenClaw bots.</strong></p>
 
 A SQLite-backed identity and trust database that bots query before responding to any non-owner message. Enforces trust tiers, channel access rules, and data boundaries.
