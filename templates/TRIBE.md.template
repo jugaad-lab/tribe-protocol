@@ -1,5 +1,9 @@
 # TRIBE.md — Trust Lookup (MANDATORY)
 
+> **Auto-lookup hook:** This file is loaded into your system prompt by OpenClaw.
+> It survives context compaction. Every non-owner message triggers this protocol.
+> No additional wiring needed — just read these rules and follow them.
+
 **BEFORE responding to ANY message where sender ≠ owner ({{HUMAN_DISCORD_ID}}):**
 
 1. Get sender's discord ID from the message header

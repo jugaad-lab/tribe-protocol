@@ -32,6 +32,11 @@ done
 # Build query based on input
 if [ -n "$DISCORD_ID" ]; then
     # Primary lookup by discord ID
+    # Validate discord ID is numeric to prevent SQL injection
+    if ! [[ "$DISCORD_ID" =~ ^[0-9]+$ ]]; then
+        echo "❌ Invalid Discord ID: must be numeric."
+        exit 1
+    fi
     RESULT=$(db_query "SELECT e.id, e.name, e.type, e.trust_tier, e.status, e.relationship, e.bio,
         owner.name, e.timezone
         FROM entities e
@@ -74,8 +79,10 @@ if [ -n "$DISCORD_ID" ]; then
     echo "   $(tier_rules "$TIER_V")"
 
 elif [ -n "$NAME" ]; then
+    # Sanitize name input (strip quotes/semicolons)
+    SAFE_NAME="${NAME//[\'\";\`]/}"
     RESULTS=$(db_query "SELECT e.id, e.name, e.type, e.trust_tier, e.status
-        FROM entities e WHERE e.name LIKE '%$NAME%';" 2>/dev/null || true)
+        FROM entities e WHERE e.name LIKE '%$SAFE_NAME%';" 2>/dev/null || true)
     if [ -z "$RESULTS" ]; then
         echo "❌ No entities found matching name: $NAME"
         exit 0
@@ -86,9 +93,10 @@ elif [ -n "$NAME" ]; then
     done <<< "$RESULTS"
 
 elif [ -n "$TAG" ]; then
+    SAFE_TAG="${TAG//[\'\";\`]/}"
     RESULTS=$(db_query "SELECT e.id, e.name, e.type, e.trust_tier, e.status
         FROM entities e JOIN entity_tags et ON e.id = et.entity_id
-        WHERE et.tag='$TAG';" 2>/dev/null || true)
+        WHERE et.tag='$SAFE_TAG';" 2>/dev/null || true)
     if [ -z "$RESULTS" ]; then
         echo "❌ No entities found with tag: $TAG"
         exit 0
@@ -99,9 +107,10 @@ elif [ -n "$TAG" ]; then
     done <<< "$RESULTS"
 
 elif [ -n "$SERVER" ]; then
+    SAFE_SERVER="${SERVER//[\'\";\`]/}"
     RESULTS=$(db_query "SELECT e.name, e.type, e.trust_tier, sr.role
         FROM entities e JOIN server_roles sr ON e.id = sr.entity_id
-        WHERE sr.server_slug='$SERVER';" 2>/dev/null || true)
+        WHERE sr.server_slug='$SAFE_SERVER';" 2>/dev/null || true)
     if [ -z "$RESULTS" ]; then
         echo "❌ No entities found on server: $SERVER"
         exit 0

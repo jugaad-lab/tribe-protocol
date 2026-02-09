@@ -10,6 +10,7 @@ BOT_DISCORD_ID=""
 HUMAN_NAME=""
 HUMAN_DISCORD_ID=""
 DB_PATH=""
+SERVERS=()
 
 # Parse args
 while [[ $# -gt 0 ]]; do
@@ -19,6 +20,7 @@ while [[ $# -gt 0 ]]; do
         --human-name) HUMAN_NAME="$2"; shift 2 ;;
         --human-discord-id) HUMAN_DISCORD_ID="$2"; shift 2 ;;
         --db-path) DB_PATH="$2"; shift 2 ;;
+        --server) SERVERS+=("$2"); shift 2 ;;
         *) echo "❌ Unknown option: $1"; exit 1 ;;
     esac
 done
@@ -53,20 +55,20 @@ echo "   DB: $DB_FILE"
 LIB_DIR="$(get_lib_dir)"
 sqlite3 "$DB_FILE" < "$LIB_DIR/schema.sql"
 
-# Seed data access rules
+# Seed default data access rules (universal — not bot-specific)
+# These are safe defaults; customize post-init with `tribe access` command
 sqlite3 "$DB_FILE" <<'EOF'
 INSERT INTO data_access (min_tier, resource_pattern, allowed, description) VALUES
 (4, 'USER.md', 1, 'Only owner sees USER.md'),
 (4, 'MEMORY.md', 1, 'Only owner sees MEMORY.md'),
 (4, 'memory/*', 1, 'Only owner sees daily logs'),
-(4, 'health/*', 1, 'Only owner sees health data'),
-(4, 'portfolio/*', 1, 'Only owner sees financial data'),
+(4, '.env', 1, 'Only owner sees env files'),
 (3, 'projects/*', 1, 'Tribe can access projects'),
 (3, 'research/*', 1, 'Tribe can access research'),
-(2, 'public/*', 1, 'Acquaintances see public stuff'),
-(4, '.env', 1, 'Only owner sees env files'),
-(4, 'calendar', 1, 'Only owner sees calendar');
+(2, 'public/*', 1, 'Acquaintances see public stuff');
 EOF
+# NOTE: Bot-specific paths (health/*, portfolio/*, calendar, etc.)
+# should be added post-init: tribe access --add --tier 4 --pattern 'health/*'
 
 # Seed bot entity if provided
 if [ -n "$BOT_NAME" ] && [ -n "$BOT_DISCORD_ID" ]; then
@@ -88,6 +90,22 @@ if [ -n "$HUMAN_NAME" ] && [ -n "$HUMAN_DISCORD_ID" ]; then
     fi
     echo "   ✅ Owner entity created: $HUMAN_NAME (Tier 4)"
 fi
+
+# Seed server roles if --server provided (format: slug:guild_id e.g. electrons:000000000000000008)
+for SERVER_ENTRY in "${SERVERS[@]}"; do
+    IFS=':' read -r S_SLUG S_GUILD_ID <<< "$SERVER_ENTRY"
+    if [ -n "$S_SLUG" ]; then
+        # Add bot to server
+        if [ -n "${BOT_ID:-}" ]; then
+            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, role) VALUES ($BOT_ID, '$S_SLUG', 'bot');"
+        fi
+        # Add owner to server
+        if [ -n "${HUMAN_ID:-}" ]; then
+            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, role) VALUES ($HUMAN_ID, '$S_SLUG', 'admin');"
+        fi
+        echo "   ✅ Server added: $S_SLUG (guild: ${S_GUILD_ID:-unknown})"
+    fi
+done
 
 # Audit log
 sqlite3 "$DB_FILE" "INSERT INTO audit_log (action, new_value, reason, changed_by) VALUES ('init', 'schema_v1', 'Initial database setup', '${BOT_NAME:-system}');"
