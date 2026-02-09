@@ -45,9 +45,24 @@ check_db() {
     fi
 }
 
+# Sanitize string for SQL (escape single quotes)
+sql_escape() {
+    echo "${1//\'/\'\'}"
+}
+
+# Validate discord ID is numeric
+validate_discord_id() {
+    local id="$1"
+    if ! [[ "$id" =~ ^[0-9]+$ ]]; then
+        echo "❌ Invalid Discord ID: must be numeric." >&2
+        return 1
+    fi
+}
+
 # Resolve entity ID from discord_id
 resolve_entity_id() {
     local discord_id="$1"
+    validate_discord_id "$discord_id" || return 1
     local db_path
     db_path="$(get_db_path)"
     sqlite3 "$db_path" "SELECT entity_id FROM platform_ids WHERE platform='discord' AND platform_id='$discord_id' LIMIT 1;"

@@ -53,6 +53,20 @@ if [[ "$TYPE" != "human" && "$TYPE" != "bot" ]]; then
     exit 1
 fi
 
+# Validate discord ID is numeric
+validate_discord_id "$DISCORD_ID" || exit 1
+
+# Sanitize all string inputs
+NAME="$(sql_escape "$NAME")"
+RELATIONSHIP="$(sql_escape "$RELATIONSHIP")"
+BIO="$(sql_escape "$BIO")"
+TIMEZONE="$(sql_escape "$TIMEZONE")"
+SERVER="$(sql_escape "$SERVER")"
+ROLE="$(sql_escape "$ROLE")"
+FRAMEWORK="$(sql_escape "$FRAMEWORK")"
+MODEL="$(sql_escape "$MODEL")"
+MACHINE="$(sql_escape "$MACHINE")"
+
 # Check if discord ID already exists
 EXISTING=$(db_query "SELECT e.name FROM entities e JOIN platform_ids p ON e.id = p.entity_id WHERE p.platform='discord' AND p.platform_id='$DISCORD_ID';" 2>/dev/null || true)
 if [ -n "$EXISTING" ]; then
@@ -79,10 +93,10 @@ OWNER_CLAUSE="NULL"
 [ -n "$OWNER_ID" ] && OWNER_CLAUSE="$OWNER_ID"
 
 BIO_CLAUSE="NULL"
-[ -n "$BIO" ] && BIO_CLAUSE="'$(echo "$BIO" | sed "s/'/''/g")'"
+[ -n "$BIO" ] && BIO_CLAUSE="'$BIO'"
 
 REL_CLAUSE="NULL"
-[ -n "$RELATIONSHIP" ] && REL_CLAUSE="'$(echo "$RELATIONSHIP" | sed "s/'/''/g")'"
+[ -n "$RELATIONSHIP" ] && REL_CLAUSE="'$RELATIONSHIP'"
 
 TZ_CLAUSE="NULL"
 [ -n "$TIMEZONE" ] && TZ_CLAUSE="'$TIMEZONE'"

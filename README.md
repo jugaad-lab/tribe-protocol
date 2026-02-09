@@ -124,9 +124,15 @@ The database seeds universal defaults at init. Add bot-specific paths post-init:
 **Add your own after init:**
 ```bash
 # Example: protect health and financial data
-./scripts/tribe.sh access --add --tier 4 --pattern 'health/*' --desc 'Health data'
-./scripts/tribe.sh access --add --tier 4 --pattern 'portfolio/*' --desc 'Financial data'
-./scripts/tribe.sh access --add --tier 4 --pattern 'calendar' --desc 'Calendar access'
+./scripts/tribe.sh data-add --tier 4 --pattern 'health/*' --desc 'Health data'
+./scripts/tribe.sh data-add --tier 4 --pattern 'portfolio/*' --desc 'Financial data'
+./scripts/tribe.sh data-add --tier 4 --pattern 'calendar' --desc 'Calendar access'
+
+# List all rules
+./scripts/tribe.sh data-list
+
+# Remove a rule
+./scripts/tribe.sh data-remove --pattern 'calendar'
 ```
 
 ## How the Auto-Lookup Works

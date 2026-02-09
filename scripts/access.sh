@@ -94,9 +94,69 @@ case "$COMMAND" in
         echo "✅ Revoked $NAME access from $SERVER (${CHANNEL:-all channels})"
         ;;
 
+    data-add)
+        DA_TIER=""
+        DA_PATTERN=""
+        DA_DESC=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --tier) DA_TIER="$2"; shift 2 ;;
+                --pattern) DA_PATTERN="$2"; shift 2 ;;
+                --desc) DA_DESC="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+
+        if [ -z "$DA_TIER" ] || [ -z "$DA_PATTERN" ]; then
+            echo "Usage: tribe data-add --tier <0-4> --pattern 'health/*' [--desc 'Description']"
+            exit 1
+        fi
+
+        DA_PATTERN="$(sql_escape "$DA_PATTERN")"
+        DA_DESC="$(sql_escape "$DA_DESC")"
+
+        db_query "INSERT INTO data_access (min_tier, resource_pattern, allowed, description) VALUES ($DA_TIER, '$DA_PATTERN', 1, '$DA_DESC');"
+        echo "✅ Data access rule added: tier $DA_TIER+ can access '$DA_PATTERN'"
+        ;;
+
+    data-remove)
+        DA_PATTERN=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --pattern) DA_PATTERN="$2"; shift 2 ;;
+                *) shift ;;
+            esac
+        done
+
+        if [ -z "$DA_PATTERN" ]; then
+            echo "Usage: tribe data-remove --pattern 'health/*'"
+            exit 1
+        fi
+
+        DA_PATTERN="$(sql_escape "$DA_PATTERN")"
+        db_query "DELETE FROM data_access WHERE resource_pattern='$DA_PATTERN';"
+        echo "✅ Data access rule removed: '$DA_PATTERN'"
+        ;;
+
+    data-list)
+        RULES=$(db_query_column "SELECT min_tier, resource_pattern, description FROM data_access ORDER BY min_tier DESC, resource_pattern;" 2>/dev/null || true)
+        if [ -z "$RULES" ]; then
+            echo "No data access rules configured."
+        else
+            echo "📋 Data access rules:"
+            echo "$RULES"
+        fi
+        ;;
+
     *)
-        echo "Usage: tribe grant <discord_id> --server <slug> [--channel <id>] [--read-only]"
-        echo "       tribe revoke <discord_id> --server <slug> [--channel <id>]"
+        echo "Channel access:"
+        echo "  tribe grant <discord_id> --server <slug> [--channel <id>] [--read-only]"
+        echo "  tribe revoke <discord_id> --server <slug> [--channel <id>]"
+        echo ""
+        echo "Data access:"
+        echo "  tribe data-add --tier <0-4> --pattern 'path/*' [--desc 'Description']"
+        echo "  tribe data-remove --pattern 'path/*'"
+        echo "  tribe data-list"
         exit 1
         ;;
 esac

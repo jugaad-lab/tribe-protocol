@@ -95,13 +95,15 @@ fi
 for SERVER_ENTRY in "${SERVERS[@]}"; do
     IFS=':' read -r S_SLUG S_GUILD_ID <<< "$SERVER_ENTRY"
     if [ -n "$S_SLUG" ]; then
+        GUILD_CLAUSE="NULL"
+        [ -n "${S_GUILD_ID:-}" ] && GUILD_CLAUSE="'$S_GUILD_ID'"
         # Add bot to server
         if [ -n "${BOT_ID:-}" ]; then
-            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, role) VALUES ($BOT_ID, '$S_SLUG', 'bot');"
+            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, server_id, role) VALUES ($BOT_ID, '$S_SLUG', $GUILD_CLAUSE, 'bot');"
         fi
         # Add owner to server
         if [ -n "${HUMAN_ID:-}" ]; then
-            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, role) VALUES ($HUMAN_ID, '$S_SLUG', 'admin');"
+            sqlite3 "$DB_FILE" "INSERT OR IGNORE INTO server_roles (entity_id, server_slug, server_id, role) VALUES ($HUMAN_ID, '$S_SLUG', $GUILD_CLAUSE, 'admin');"
         fi
         echo "   ✅ Server added: $S_SLUG (guild: ${S_GUILD_ID:-unknown})"
     fi
