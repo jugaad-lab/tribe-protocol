@@ -7,6 +7,8 @@
 <p align="center">[![ClawHub](https://img.shields.io/badge/ClawHub-tribe--protocol-teal)](https://clawhub.ai/skills/tribe-protocol)</p>
 <p align="center">**Install via ClawHub:** `clawhub install tribe-protocol`</p>
 
+> ⭐ **Found this useful? [Star this repo](https://github.com/jugaad-lab/tribe-protocol)** to help others discover it!
+
 <p align="center"><strong>Trust lookup system for OpenClaw bots.</strong></p>
 
 A SQLite-backed identity and trust database that bots query before responding to any non-owner message. Enforces trust tiers, channel access rules, and data boundaries.
@@ -196,3 +198,9 @@ MIT
 ## Author
 
 Built by [jugaad-lab](https://github.com/jugaad-lab) for the Electrons in a Box ecosystem.
+
+## 🤝 Contributing
+
+Found a bug? Have an idea? [Open an issue](https://github.com/jugaad-lab/tribe-protocol/issues) or submit a PR!
+
+If this tool saved you time, please ⭐ **star this repo** — it helps others find it.
