@@ -4,12 +4,19 @@
 
 <h1 align="center">Tribe Protocol</h1>
 
-<p align="center">[![ClawHub](https://img.shields.io/badge/ClawHub-tribe--protocol-teal)](https://clawhub.ai/skills/tribe-protocol)</p>
+<p align="center">
+[![ClawHub](https://img.shields.io/badge/ClawHub-tribe--protocol-teal)](https://clawhub.ai/skills/tribe-protocol)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub Repo stars](https://img.shields.io/github/stars/jugaad-lab/tribe-protocol?style=social)](https://github.com/jugaad-lab/tribe-protocol/stargazers)
+</p>
+
 <p align="center">**Install via ClawHub:** `clawhub install tribe-protocol`</p>
 
 > ⭐ **Found this useful? [Star this repo](https://github.com/jugaad-lab/tribe-protocol)** to help others discover it!
 
 <p align="center"><strong>Trust lookup system for OpenClaw bots.</strong></p>
+
+> 📌 **If you find this useful, please ⭐ star this repo!** It helps other developers discover trust & access control tools for AI bots.
 
 A SQLite-backed identity and trust database that bots query before responding to any non-owner message. Enforces trust tiers, channel access rules, and data boundaries.
 
@@ -194,6 +201,21 @@ Core tables:
 ## License
 
 MIT
+
+---
+## More from Jugaad Lab 🔧
+| Tool | What it does |
+|------|-------------|
+| [claude-code-mastery](https://github.com/jugaad-lab/claude-code-mastery) | Master Claude Code with subagents & automation |
+| [tokenmeter](https://github.com/jugaad-lab/tokenmeter) | Track AI token usage & costs locally |
+| [clawguard](https://github.com/jugaad-lab/clawguard) | Security blacklist for AI agents |
+| [clawdscan](https://github.com/jugaad-lab/clawdscan) | Session health analyzer for OpenClaw |
+| [skilldoc](https://github.com/jugaad-lab/skilldoc) | Skill health checker for OpenClaw |
+| [tribe-protocol](https://github.com/jugaad-lab/tribe-protocol) | Trust & access control for AI bots |
+| [discord-voice-plugin](https://github.com/jugaad-lab/discord-voice-plugin) | Voice conversations with AI in Discord |
+| [worldmonitor](https://github.com/jugaad-lab/worldmonitor) | Real-time global intelligence dashboard |
+
+⭐ **Found these useful? Star the repos you like!**
 
 ## Author
 
